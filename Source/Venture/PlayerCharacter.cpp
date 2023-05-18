@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "PC_PlayerController.h"
+#include "Projectile.h"
 #include "GameFramework/FloatingPawnMovement.h"
 
 
@@ -43,12 +44,30 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlayerControllerRef = Cast<APlayerController>(GetController());
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (PlayerControllerRef)
+	{
+		FHitResult HitResult;
+		PlayerControllerRef->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+
+		// Used for debug purposes
+		DrawDebugSphere(
+			GetWorld(),
+			HitResult.ImpactPoint,
+			25.f,
+			12,
+			FColor::Purple,
+			false,
+			-1.f);
+	}
 }
 
 // Called to bind functionality to input
@@ -64,6 +83,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	                                   &APlayerCharacter::Move);
 	EnhancedInputComponent->BindAction(PlayerController->RotateAction, ETriggerEvent::Triggered, this,
 	                                   &APlayerCharacter::Rotate);
+	EnhancedInputComponent->BindAction(PlayerController->FireAction, ETriggerEvent::Triggered, this,
+	                                   &APlayerCharacter::Fire);
 
 	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	check(LocalPlayer);
@@ -92,7 +113,6 @@ void APlayerCharacter::Move(const FInputActionValue& ActionValue)
 	AddMovementInput(GetActorForwardVector(), MovementAmount);
 }
 
-
 void APlayerCharacter::Rotate(const FInputActionValue& ActionValue)
 {
 	constexpr float InterpolationSpeed = 5.f;
@@ -102,8 +122,20 @@ void APlayerCharacter::Rotate(const FInputActionValue& ActionValue)
 
 	const FRotator TargetRotation = TurretMesh->GetComponentRotation() + Input;
 
-	const FRotator SmoothedRotation = FMath::RInterpTo(
-		TurretMesh->GetComponentRotation(), TargetRotation, GetWorld()->GetDeltaSeconds(), InterpolationSpeed);
+	const FRotator SmoothedRotation =
+		FMath::RInterpTo(
+			TurretMesh->GetComponentRotation(),
+			TargetRotation,
+			GetWorld()->GetDeltaSeconds(),
+			InterpolationSpeed);
 
 	TurretMesh->SetWorldRotation(SmoothedRotation); // Set the rotation of TurretMesh
+}
+
+void APlayerCharacter::Fire()
+{
+	const FVector Location = ProjectileSpawnPoint->GetComponentLocation();
+	const FRotator Rotation = ProjectileSpawnPoint->GetComponentRotation();
+
+	GetWorld()->SpawnActor<AProjectile>(ProjectileClass, Location, Rotation);
 }

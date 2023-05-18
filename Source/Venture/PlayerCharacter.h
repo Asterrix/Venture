@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerCharacter.generated.h"
 
+class AProjectile;
 class UFloatingPawnMovement;
 struct FInputActionValue;
 class UCameraComponent;
@@ -25,8 +26,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:
+	void Fire();
 	void Move(const FInputActionValue& ActionValue);
 	void Rotate(const FInputActionValue& ActionValue);
 
@@ -58,6 +58,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float RotationSpeed = 25.f;
+
+	UPROPERTY()
+	APlayerController* PlayerControllerRef;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	TSubclassOf<AProjectile> ProjectileClass;
 
 public:
 	// Called every frame
