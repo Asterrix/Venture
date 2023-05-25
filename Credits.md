@@ -1,2 +1,0 @@
-"Stuart Tank Animated" (https://skfb.ly/6WTnH) by iedalton is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
-"88mm shell" (https://skfb.ly/o9GVX) by charley309 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).

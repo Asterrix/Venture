@@ -6,9 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "VentureGameModeBase.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class VENTURE_API AVentureGameModeBase : public AGameModeBase
 {
